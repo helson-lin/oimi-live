@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oimi Live</title>
+    <script src="/vendor/axios.min.js"></script>
+    <script src="/vendor/flv.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <video
+      id="videoElement"
+      style="width: 100%; height: 100%"
+      controls
+      muted
+      autoplay
+    ></video>
+    <script>
+      function randomString(e) {
+        e = e || 32;
+        var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+          a = t.length,
+          n = "";
+        for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+        return n;
+      }
+      if (flvjs.isSupported()) {
+        var videoElement = document.getElementById("videoElement");
+        const url = new URL(window.location);
+        const uri = url.searchParams.get("uri");
+        const _url = url.searchParams.get("url");
+        const rtmpOrrtspUrl = uri || _url
+        // console.log(rtmpOrrtspUrl, window.location, url)
+        // `ws://localhost:8888/rtsp/id123?url=rtsp://180.102.26.110:554/mys`
+        // `ws://localhost:8888/rtsp/id123?url=rtmp://180.102.26.110/live/admin`,
+        var flvPlayer = flvjs.createPlayer({
+          type: "flv",
+          isLive: true,
+          url: `ws://${url.host}/live/${randomString(6)}?url=${rtmpOrrtspUrl}`,
+        });
+        flvPlayer.attachMediaElement(videoElement);
+        flvPlayer.load();
+        flvPlayer.play();
+      }
+    </script>
+  </body>
+</html>

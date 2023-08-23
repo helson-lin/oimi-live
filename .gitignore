@@ -1,0 +1,7 @@
+node_modules
+License.oimi
+.vscode
+*.oimi
+logs
+dist
+lib

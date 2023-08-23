@@ -1,0 +1,46 @@
+{
+  "name": "live_tramsfrom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "bin": "bin/index.js",
+  "scripts": {
+    "dev": "nodemon ./bin/index.js",
+    "pkg": "pkg . --debug",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "pkg": {
+    "scripts": [
+      "src/**/*.js",
+      "app.js"
+    ],
+    "assets": [
+      "./public/**/*",
+      "./public/*",
+      "bin/**/*"
+    ],
+    "targets": [
+      "node14-linux-x64",
+      "node14-win-x64",
+      "node14-darwin-x64"
+    ],
+    "outputPath": "dist"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "base-64": "^1.0.0",
+    "download": "^8.0.0",
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "fs-extra": "^11.1.1",
+    "log4js": "^6.9.1",
+    "macaddress": "^0.5.3",
+    "moment": "^2.29.4",
+    "utf8": "^3.0.0",
+    "websocket-stream": "^5.5.2",
+    "yamljs": "^0.3.0"
+  }
+}
