@@ -13,9 +13,10 @@ const PORT = ymlConfig?.port || 8005;
 
 const intervalCheckTime = () => {
   const startTime = moment();
+  logger.warn('没有证书，试用时间为30分钟')
   setInterval(() => {
     const isOutLimit = moment().diff(startTime, "minutes");
-    if (isOutLimit >= 1) {
+    if (isOutLimit >= 30) {
       logger.info("试用时间已经到期！！！")
       process.exitCode = 1;
       process.nextTick(() => {
@@ -26,7 +27,7 @@ const intervalCheckTime = () => {
 }
 
 const isOutAuth = async () => {
-  const licenseInfo = Helper.licenseCheck()
+  const licenseInfo = await Helper.licenseCheck()
   if (!licenseInfo?.isPass) {
     logger.warn(licenseInfo.msg)
     intervalCheckTime()
@@ -105,7 +106,9 @@ function requestHandle(ws, req) {
         // 摄像机断线的处理
       })
       .outputFormat("flv")
-      .videoCodec("libx264")  
+      .videoCodec("libx264")
+      .audioCodec('aac')  
+      .audioFrequency(11025)
       .pipe(stream);
   } catch (error) {
     console.log(error);

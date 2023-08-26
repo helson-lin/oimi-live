@@ -226,14 +226,16 @@ const Helper = {
             return null
         }
     },
-    licenseCheck() {
+    async licenseCheck() {
         const licenseDecodeData = this.getLicense()
+        if (!licenseDecodeData) return { isPass: false, msg: '没有证书' }
         const licenseData = this.decrypt(licenseDecodeData)
         const [deviceUUID, timestamp] = licenseData.split('@')
         const limitTime = base64.decode(timestamp)
-        if (deviceUUID !== this.getUUID()) return { isPass: false, msg: '这不是您的证书' }
+        const currentDeviceUUID = await  this.getUUID()
+        if (deviceUUID !== currentDeviceUUID) return { isPass: false, msg: '这不是您的证书' }
         if (limitTime < Date.now()) return { isPass: false, msg: '您的证书已过期' }
-        return { isPass: true }
+        return { isPass: true, msg: '证书有效' }
     }
 }
 
