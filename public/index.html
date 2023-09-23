@@ -41,9 +41,6 @@
         const uri = url.searchParams.get("uri");
         const _url = url.searchParams.get("url");
         const rtmpOrrtspUrl = uri || _url
-        // console.log(rtmpOrrtspUrl, window.location, url)
-        // `ws://localhost:8888/rtsp/id123?url=rtsp://180.102.26.110:554/mys`
-        // `ws://localhost:8888/rtsp/id123?url=rtmp://180.102.26.110/live/admin`,
         var flvPlayer = flvjs.createPlayer({
           type: "flv",
           isLive: true,

@@ -3,12 +3,15 @@ const childProcess = require('child_process')
 const fse = require('fs-extra')
 const path = require('path')
 const os = require('os')
+const ip = require('ip')
+const chalk = require('chalk')
 const ffmpeg = require('fluent-ffmpeg')
 const moment = require('moment')
 const download = require('download')
 const crypto = require('crypto')
 const macaddress = require("macaddress");
 const base64 = require('base-64');
+const { Console } = require("console");
 const algorithm = 'aes-256-cbc';
 const key = '59955dce7aac4bec21d565fdwc2wd342';
 const iv = '991c5d95401fa167';
@@ -155,12 +158,12 @@ const Helper = {
      */
     async downloadAndSetEnv(url, libPath, type) {
         try {
-            console.log('[oimi live] server is downloading ffmpeg dependency')
+            console.log(chalk.cyanBright.bold('[oimi live] server is downloading ffmpeg dependency, it will auto start server after downloaded'))
             await download(url, 'lib', { extract: true })
             this.setEnv(type, libPath)
             await this.chmod(libPath)
         } catch (e) {
-            console.warn('[oimi live] download and set env failed:' + String(e).trim())
+            console.warn(chalk.red('[oimi live] download and set env failed:' + String(e).trim()))
         }
     },
     /**
@@ -232,10 +235,34 @@ const Helper = {
         const licenseData = this.decrypt(licenseDecodeData)
         const [deviceUUID, timestamp] = licenseData.split('@')
         const limitTime = base64.decode(timestamp)
-        const currentDeviceUUID = await  this.getUUID()
+        const currentDeviceUUID = await this.getUUID()
         if (deviceUUID !== currentDeviceUUID) return { isPass: false, msg: '这不是您的证书' }
         if (limitTime < Date.now()) return { isPass: false, msg: '您的证书已过期' }
         return { isPass: true, msg: '证书有效' }
+    },
+    mixUpTime(timestamp, mixUp = true) {
+        const st = 'abcdefghij'
+        if (mixUp) return String(timestamp).split('').map(i => st.charAt(i)).reverse().join('')
+        return String(timestamp).split('').reverse().map(i => Array.from(st).findIndex(j => j === i)).join('')
+    },
+    writeCachce() {
+        let cacheTime = moment().valueOf()
+        console.log(cacheTime)
+        cacheTime = this.mixUpTime(cacheTime)
+        const oimiCacheFile = path.join(process.cwd(), '.oimi')
+        fse.ensureFileSync(oimiCacheFile)
+        fse.appendFileSync(oimiCacheFile, '\n' + cacheTime, 'utf8')
+        // 写入CACHE
+    },
+    readCacheTime() {
+        const oimiCacheFile = path.join(process.cwd(), '.oimi')
+        const allTimes = fse.readFileSync(oimiCacheFile, 'utf-8').split('\n').filter(i => i)
+        let latestStartTime = allTimes[allTimes.length - 1]
+        latestStartTime = this.mixUpTime(latestStartTime, false)
+        return latestStartTime
+    },
+    listenLog (port) {
+        console.log(`\nServer running at: \n- Local: ${chalk.cyan(`http://localhost:${port}`)}\n- NetWork: ${chalk.cyan(`http://${ip.address()}:${port}`)}`)
     }
 }
 

@@ -14,6 +14,10 @@ const PORT = ymlConfig?.port || 8005;
 const intervalCheckTime = () => {
   const startTime = moment();
   logger.warn('没有证书，试用时间为30分钟')
+  let latestStartTime = Helper.readCacheTime();
+  latestStartTime = moment(latestStartTime)
+  const isInterverHours = moment().diff(latestStartTime, 'hours')
+  console.log(isInterverHours)
   setInterval(() => {
     const isOutLimit = moment().diff(startTime, "minutes");
     if (isOutLimit >= 30) {
@@ -29,7 +33,6 @@ const intervalCheckTime = () => {
 const isOutAuth = async () => {
   const licenseInfo = await Helper.licenseCheck()
   if (!licenseInfo?.isPass) {
-    logger.warn(licenseInfo.msg)
     intervalCheckTime()
   } else {
     // 当前证书是正常的
@@ -39,10 +42,10 @@ const isOutAuth = async () => {
 
 const setFfmpegPath = async () => {
   if (ymlConfig?.ffmpeg) {
-    console.log('[oimi live] set ffmpeg env by path:', ymlConfig.ffmpeg)
+    logger.info('Set ffmpeg Env by path:', ymlConfig.ffmpeg)
     ffmpeg.setFfmpegPath(ymlConfig.ffmpeg)
   } else {
-    console.log('[oimi live] waiting for dependency install')
+    logger.info('waiting for dependency install')
     await Helper.downloadDependency(['ffmpeg'])
   }
 }
@@ -61,10 +64,10 @@ const bootstrap = async () => {
   });
   app.ws("/live/:id/", requestHandle);
   app.listen(PORT, async () => {
-    console.log(`Server is running on port: ${PORT}`);
     const UUID = await Helper.getUUID()
     logger.info("UUID:" + UUID)
     isOutAuth()
+    setTimeout(() => Helper.listenLog(PORT), 0);
   });
 }
 
@@ -89,29 +92,28 @@ function requestHandle(ws, req) {
     ffmpeg(url)
       .addInputOption(...options)
       .on("start", function (commandLine) {
-        console.log(commandLine, "Stream started.");
+        logger.info(commandLine, "Stream started.");
       })
       .on("codecData", function () {
-        console.log(url, "Stream codecData.");
+        logger.info("Stream codecData:" + url);
         // 摄像机在线处理
       })
       .on("error", function (err) {
-        console.log(url, "An error occured: ", err + '');
+        logger.error("An error occured: ", url + err );
       })
       .on('stderr', function(stderrLine) {
-        console.log('Stderr output: ' + stderrLine);
+        logger.error('Stderr output: ' + stderrLine);
       })
       .on("end", function () {
-        console.log(url, "Stream end!");
-        // 摄像机断线的处理
+        logger.info("Stream Closed! Url:" + url);
       })
       .outputFormat("flv")
       .videoCodec("libx264")
-      .audioCodec('aac')  
+      .audioCodec('aac')
       .audioFrequency(11025)
       .pipe(stream);
   } catch (error) {
-    console.log(error);
+    logger.warn(error);
   }
 }
 
