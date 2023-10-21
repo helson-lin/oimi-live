@@ -43,5 +43,8 @@
     "utf8": "^3.0.0",
     "websocket-stream": "^5.5.2",
     "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   }
 }

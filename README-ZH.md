@@ -2,7 +2,7 @@
 <img style="width: 40px;margin-bottom:10px;" src="https://file.helson-lin.cn/picgooim-live.svg"/> Oimi live
 </p>
 
-<p align="center">Oimi live is a rtmp/rtsp player.</p>
+<p align="center">Oimi Live是一个rtmp/rtsp播放器。</p>
 <p align="center">
     <a href="https://github.com/helson-lin/oimi-live">
           <img alt="release downloads" src="https://img.shields.io/github/downloads/helson-lin/oimi-live/total?color=brightgreen&label=release%20download"/>
@@ -20,31 +20,25 @@
 
 
 
-## Instructions
+## 说明
 
-After the service starts, embed the url using the iframe
+服务启动之后，直接嵌入页面内使用即可：
+地址为`http://${host}:${port}/index.html?uri=${url}`
 
-embed url: `http://${host}:${port}/index.html?uri=${url}`
-
-- ${host} Local address
-- ${port} Server port
-- ${url}  rtmp/rtsp url
+- ${host} 本机的ip
+- ${port} 服务的端口
+- ${url}  需要播放的rtmp/rtsp地址
 
 ```html
 <iframe src="http://localhost:8005/index.html?uri=$url"></iframe>
 ```
 
 
-### About Configuration
+### 关于配置文件
 
-port: server port
+port: 服务的端口
+ffmpeg: 删除改配置默认会自动下载依赖/填写需要填写绝对的地址
 
-ffmpeg: ffmpeg executable file /(Fill in the absolute address to be filled in) 
-
-
-delete ffmpeg option, the server will auto download ffmpeg executable file, by default
-
-
-### Example
+### 测试地址
 
 test url: http://localhost:8005/index.html?uri=rtmp://180.102.26.110/live/admin
