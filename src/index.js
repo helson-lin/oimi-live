@@ -6,39 +6,9 @@ const webSocketStream = require("websocket-stream/stream");
 const path = require("path");
 const process = require("process");
 const fse = require('fs-extra')
-const moment = require("moment");
 const logger = require('./log')
 const ymlConfig = Helper.readYml()
 const PORT = ymlConfig?.port || 8005;
-
-const intervalCheckTime = () => {
-  const startTime = moment();
-  logger.warn('没有证书，试用时间为30分钟')
-  let latestStartTime = Helper.readCacheTime();
-  latestStartTime = moment(latestStartTime)
-  const isInterverHours = moment().diff(latestStartTime, 'hours')
-  console.log(isInterverHours)
-  setInterval(() => {
-    const isOutLimit = moment().diff(startTime, "minutes");
-    if (isOutLimit >= 30) {
-      logger.info("试用时间已经到期！！！")
-      process.exitCode = 1;
-      process.nextTick(() => {
-        process.exit()
-      })
-    }
-  }, 6000)
-}
-
-const isOutAuth = async () => {
-  const licenseInfo = await Helper.licenseCheck()
-  if (!licenseInfo?.isPass) {
-    intervalCheckTime()
-  } else {
-    // 当前证书是正常的
-    setTimeout(() => { isOutAuth() }, 6000)
-  }
-};
 
 const setFfmpegPath = async () => {
   if (ymlConfig?.ffmpeg) {
@@ -64,10 +34,7 @@ const bootstrap = async () => {
   });
   app.ws("/live/:id/", requestHandle);
   app.listen(PORT, async () => {
-    const UUID = await Helper.getUUID()
-    logger.info("UUID:" + UUID)
-    isOutAuth()
-    setTimeout(() => Helper.listenLog(PORT), 0);
+    Helper.listenLog(PORT);
   });
 }
 

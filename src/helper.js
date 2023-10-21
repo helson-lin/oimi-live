@@ -6,15 +6,7 @@ const os = require('os')
 const ip = require('ip')
 const chalk = require('chalk')
 const ffmpeg = require('fluent-ffmpeg')
-const moment = require('moment')
 const download = require('download')
-const crypto = require('crypto')
-const macaddress = require("macaddress");
-const base64 = require('base-64');
-const { Console } = require("console");
-const algorithm = 'aes-256-cbc';
-const key = '59955dce7aac4bec21d565fdwc2wd342';
-const iv = '991c5d95401fa167';
 
 const Helper = {
     version: '4.4.1',
@@ -211,55 +203,6 @@ const Helper = {
         } else {
             return null;
         }
-    },
-    decrypt(encrypted) {
-        let decipher = crypto.createDecipheriv(algorithm, key, iv);
-        let decrypted = decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8');
-        return decrypted
-    },
-    async getUUID() {
-        const mac = await macaddress.one();
-        return crypto.createHash("sha256").update(mac).digest("hex");
-    },
-    getLicense() {
-        try {
-            const data = fse.readFileSync(path.join(process.cwd(), 'License.oimi'), 'utf-8')
-            return data
-        } catch (e) {
-            return null
-        }
-    },
-    async licenseCheck() {
-        const licenseDecodeData = this.getLicense()
-        if (!licenseDecodeData) return { isPass: false, msg: '没有证书' }
-        const licenseData = this.decrypt(licenseDecodeData)
-        const [deviceUUID, timestamp] = licenseData.split('@')
-        const limitTime = base64.decode(timestamp)
-        const currentDeviceUUID = await this.getUUID()
-        if (deviceUUID !== currentDeviceUUID) return { isPass: false, msg: '这不是您的证书' }
-        if (limitTime < Date.now()) return { isPass: false, msg: '您的证书已过期' }
-        return { isPass: true, msg: '证书有效' }
-    },
-    mixUpTime(timestamp, mixUp = true) {
-        const st = 'abcdefghij'
-        if (mixUp) return String(timestamp).split('').map(i => st.charAt(i)).reverse().join('')
-        return String(timestamp).split('').reverse().map(i => Array.from(st).findIndex(j => j === i)).join('')
-    },
-    writeCachce() {
-        let cacheTime = moment().valueOf()
-        console.log(cacheTime)
-        cacheTime = this.mixUpTime(cacheTime)
-        const oimiCacheFile = path.join(process.cwd(), '.oimi')
-        fse.ensureFileSync(oimiCacheFile)
-        fse.appendFileSync(oimiCacheFile, '\n' + cacheTime, 'utf8')
-        // 写入CACHE
-    },
-    readCacheTime() {
-        const oimiCacheFile = path.join(process.cwd(), '.oimi')
-        const allTimes = fse.readFileSync(oimiCacheFile, 'utf-8').split('\n').filter(i => i)
-        let latestStartTime = allTimes[allTimes.length - 1]
-        latestStartTime = this.mixUpTime(latestStartTime, false)
-        return latestStartTime
     },
     listenLog (port) {
         console.log(`\nServer running at: \n- Local: ${chalk.cyan(`http://localhost:${port}`)}\n- NetWork: ${chalk.cyan(`http://${ip.address()}:${port}`)}`)
