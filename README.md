@@ -13,7 +13,7 @@
      <a href="https://github.com/helson-lin/oimi-live">
         <img alt="docker image size" src="https://img.shields.io/github/last-commit/helson-lin/oimi-live"/>
     </a>
-    <a href="/README.zh-CN.md">
+    <a href="/README-ZH.md">
         <img alt="lang" src="https://img.shields.io/badge/Lang-CN-brightgreen" />
     </a>
 </p>
