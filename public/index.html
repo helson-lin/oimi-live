@@ -1,55 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Oimi Live</title>
-    <script src="/vendor/axios.min.js"></script>
-    <script src="/vendor/flv.js"></script>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oimi Live</title>
+  <link rel="stylesheet" href="/vendor/message.min.css">
+  <script src="/vendor/axios.min.js"></script>
+  <script src="/vendor/flv.js"></script>
+  <script src="./vendor/message.min.js"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <video id="videoElement" style="width: 100%; height: 100%" controls muted autoplay></video>
+  <script>
+    window.QMSG_GLOBALS = {
+      DEFAULTS: {
+        showClose: true,
+        timeout: 5000
       }
-    </style>
-  </head>
-  <body>
-    <video
-      id="videoElement"
-      style="width: 100%; height: 100%"
-      controls
-      muted
-      autoplay
-    ></video>
-    <script>
-      function randomString(e) {
-        e = e || 32;
-        var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
-          a = t.length,
-          n = "";
-        for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
-        return n;
+    }
+    function randomString(e) {
+      e = e || 32;
+      var t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+        a = t.length,
+        n = "";
+      for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+      return n;
+    }
+    if (flvjs.isSupported()) {
+      var videoElement = document.getElementById("videoElement");
+      const url = new URL(window.location);
+      const allParams = url.href.replace(window.origin, '')
+      let rtmpOrrtspUrl;
+      debugger
+      const isHasUrl = () => ['/?url=', '/?uri='].findIndex(i => allParams.startsWith(i))
+      if (isHasUrl) {
+        rtmpOrrtspUrl = allParams.slice(6)
       }
-      if (flvjs.isSupported()) {
-        var videoElement = document.getElementById("videoElement");
-        const url = new URL(window.location);
-        const uri = url.searchParams.get("uri");
-        const _url = url.searchParams.get("url");
-        const rtmpOrrtspUrl = uri || _url
+      if (!rtmpOrrtspUrl) {
+        Qmsg.error({
+          content: "没有地址无法播放，请修改url并刷新页面",
+          timeout: 5000
+        })
+      } else {
         var flvPlayer = flvjs.createPlayer({
           type: "flv",
           isLive: true,
-          url: `ws://${url.host}/live/${randomString(6)}?url=${rtmpOrrtspUrl}`,
+          url: `ws://${url.host}/live/${randomString(6)}?url=${window.btoa(rtmpOrrtspUrl)}`,
         });
         flvPlayer.attachMediaElement(videoElement);
         flvPlayer.load();
         flvPlayer.play();
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
+
 </html>
