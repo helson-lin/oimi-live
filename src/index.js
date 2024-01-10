@@ -21,7 +21,7 @@ const setFfmpegPath = async () => {
 }
 
 const setStaticPath = (context) => {
-  const publicPaths = [path.join(__dirname, '../public'), path.join(process.cwd(),'public')]
+  const publicPaths = [path.join(__dirname, '../public'), path.join(process.cwd(), 'public')]
   const publicPath = publicPaths.find(_path => fse.pathExistsSync(_path))
   if (publicPath) context.use(express.static(publicPath))
 }
@@ -68,9 +68,9 @@ function requestHandle(ws, req) {
         // 摄像机在线处理
       })
       .on("error", function (err) {
-        logger.error("An error occured: ", url + err );
+        logger.error("An error occured: ", url + err);
       })
-      .on('stderr', function(stderrLine) {
+      .on('stderr', function (stderrLine) {
         logger.error('Stderr output: ' + stderrLine);
       })
       .on("end", function () {
