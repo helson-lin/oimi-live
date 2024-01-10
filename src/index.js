@@ -50,11 +50,13 @@ function requestHandle(ws, req) {
     }
   );
   let url = req.query.url;
+  url = Buffer.from(url, 'base64').toString('utf-8')
   try {
     const isRTMP = url.startsWith("rtmp://");
     const isRTSP = url.startsWith("rtsp://")
     const rtspOptions = ["-rtsp_transport", "tcp", "-buffer_size", "102400"]
     const rtmpOptions = ["-rtmp_live", "live"]
+    console.log(url)
     const options = isRTMP ? rtmpOptions : rtspOptions
     ffmpeg(url)
       .addInputOption(...options)

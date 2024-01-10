@@ -1,0 +1,8 @@
+media/*
+node_modules/*
+libs/*
+lib/*
+logs/*
+.vscode/*
+.github/*
+*.zip
