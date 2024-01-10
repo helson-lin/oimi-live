@@ -58,7 +58,7 @@
         var flvPlayer = flvjs.createPlayer({
           type: "flv",
           isLive: true,
-          url: `ws://${url.host}/live/${randomString(6)}?url=${window.btoa(rtmpOrrtspUrl)}`,
+          url: `${url.protocol === 'https:' ? 'wss' : 'ws'}://${url.host}/live/${randomString(6)}?url=${window.btoa(rtmpOrrtspUrl)}`,
         });
         flvPlayer.attachMediaElement(videoElement);
         flvPlayer.load();
