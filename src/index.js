@@ -25,18 +25,6 @@ const setStaticPath = (context) => {
   const publicPath = publicPaths.find(_path => fse.pathExistsSync(_path))
   if (publicPath) context.use(express.static(publicPath))
 }
-const bootstrap = async () => {
-  await setFfmpegPath()
-  let app = express();
-  setStaticPath(app)
-  expressWebSocket(app, null, {
-    perMessageDeflate: true,
-  });
-  app.ws("/live/:id/", requestHandle);
-  app.listen(PORT, async () => {
-    Helper.listenLog(PORT);
-  });
-}
 
 function requestHandle(ws, req) {
   const stream = webSocketStream(
@@ -85,4 +73,34 @@ function requestHandle(ws, req) {
   }
 }
 
-module.exports = { bootstrap }
+
+const bootstrap = async () => {
+  await setFfmpegPath()
+  let app = express();
+  setStaticPath(app)
+  expressWebSocket(app, null, {
+    perMessageDeflate: true,
+  });
+  app.ws("/live/:id/", requestHandle);
+  app.listen(PORT, async () => {
+    Helper.listenLog(PORT);
+  });
+  return app
+}
+
+const vercel = async () => {
+  setFfmpegPath()
+  let app = express();
+  setStaticPath(app)
+  expressWebSocket(app, null, {
+    perMessageDeflate: true,
+  });
+  app.ws("/live/:id/", requestHandle);
+  app.listen(PORT, async () => {
+    Helper.listenLog(PORT);
+  });
+  return app
+}
+
+
+module.exports = { bootstrap, vercel }
